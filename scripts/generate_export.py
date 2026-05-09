@@ -31,6 +31,14 @@ def get_git_sha():
         return 'unknown'
 
 
+def get_file_mtime(filepath):
+    try:
+        ts = os.path.getmtime(filepath)
+        return datetime.fromtimestamp(ts, tz=timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    except Exception:
+        return 'unknown'
+
+
 def generate_export():
     date = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
     sha = get_git_sha()
@@ -88,6 +96,9 @@ def generate_export():
         '#   Content in Markdown...',
         '#   ====END: _posts/my-new-post.md====',
         '#',
+        '# NOTE: existing files show "| last modified: <date>" in their header.',
+        '# Omit that annotation when writing a FILE block — it is metadata only.',
+        '#',
         '# ALLOWED FOLDERS: ' + '  '.join(f'{f}/' for f, _ in COLLECTIONS),
         '#',
         SEP,
@@ -109,7 +120,8 @@ def generate_export():
         for filepath in files:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
-            lines.append(f'====FILE: {filepath}====')
+            mtime = get_file_mtime(filepath)
+            lines.append(f'====FILE: {filepath} | last modified: {mtime}====')
             lines.append(content.rstrip('\n'))
             lines.append(f'====END: {filepath}====')
             lines.append('')
