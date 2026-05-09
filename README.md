@@ -2,7 +2,7 @@
 
 Export your static site content as a single plain-text file for AI editing, then ingest changes back automatically via GitHub Actions.
 
-**The idea:** visit `/out.txt` on your phone, copy everything, paste into any AI, share an idea, get a FILE block back, commit it to `_inbox/` — the site updates itself.
+**The idea:** tap the download button on your phone, upload the file to any AI, share an idea, get a FILE block back, commit it to `_inbox/` — the site updates itself.
 
 ---
 
@@ -15,9 +15,10 @@ Export your static site content as a single plain-text file for AI editing, then
 
 ### Full workflow
 
-1. Visit `yoursite.com/out.txt` → copy all → paste into Claude, ChatGPT, or any AI
-2. Share an idea → the AI reads the existing content, finds where it fits, drafts a FILE block
-3. Commit the FILE block to `_inbox/` → GitHub Actions writes the file and rebuilds the export
+1. Tap the **Export IA** button on your site → downloads `out.txt`
+2. Upload the file to Claude, ChatGPT, or any AI
+3. Share an idea → the AI reads the existing content, finds where it fits, drafts a FILE block
+4. Commit the FILE block to `_inbox/` → GitHub Actions writes the file and rebuilds the export
 
 Partial updates are accepted — the inbox only needs the files you're adding or changing.
 
@@ -25,7 +26,15 @@ Partial updates are accepted — the inbox only needs the files you're adding or
 
 ## Installation (Jekyll)
 
-### 1. Copy these files into your repo
+### 1. Run the install script
+
+From the root of your Jekyll repo:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/periggouanvic/talk-to-site/main/install.sh | bash
+```
+
+This copies the following files without overwriting anything that already exists:
 
 ```
 scripts/generate_export.py
@@ -33,6 +42,7 @@ scripts/ingest.py
 .github/workflows/generate-export.yml
 .github/workflows/ingest.yml
 _inbox/.gitkeep
+_includes/tts-button.html
 ```
 
 ### 2. Customize `scripts/generate_export.py`
@@ -83,7 +93,17 @@ exclude:
   - scripts/
 ```
 
-### 6. Push and merge
+### 6. Add the download button (optional)
+
+Copy `_includes/tts-button.html` into your site, then drop it wherever you want the button to appear — typically in your navigation or header:
+
+```liquid
+{% include tts-button.html %}
+```
+
+This renders a simple `<a href="/out.txt" download>` link. Style it with `.tts-button` in your CSS, or replace the label with whatever fits your site.
+
+### 7. Push and merge
 
 The export generates automatically on first push. Your content will be live at `/out.txt`.
 

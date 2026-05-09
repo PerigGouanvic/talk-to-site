@@ -10,6 +10,7 @@ FILES=(
   ".github/workflows/generate-export.yml"
   ".github/workflows/ingest.yml"
   "_inbox/.gitkeep"
+  "_includes/tts-button.html"
 )
 
 echo "Installing talk-to-site into $(pwd)"
@@ -44,3 +45,6 @@ echo ""
 echo "  4. Add to _config.yml:"
 echo "       exclude:"
 echo "         - scripts/"
+echo ""
+echo "  5. Add the download button to your navigation:"
+echo "       {% include tts-button.html %}"
