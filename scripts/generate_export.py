@@ -3,6 +3,7 @@
 
 import os
 import glob
+import subprocess
 from datetime import datetime, timezone
 
 # CUSTOMIZE: list your Jekyll collection folders and their human-readable names
@@ -20,8 +21,27 @@ SITE_URL = 'https://yoursite.com'
 SEP = '=' * 72
 
 
+def get_git_sha():
+    try:
+        sha = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'], stderr=subprocess.DEVNULL
+        ).decode().strip()
+        return sha[:12]
+    except Exception:
+        return 'unknown'
+
+
+def get_file_mtime(filepath):
+    try:
+        ts = os.path.getmtime(filepath)
+        return datetime.fromtimestamp(ts, tz=timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    except Exception:
+        return 'unknown'
+
+
 def generate_export():
     date = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    sha = get_git_sha()
 
     lines = [
         '---',
@@ -29,8 +49,13 @@ def generate_export():
         'permalink: /out.txt',
         '---',
         f'# {SITE_URL.replace("https://", "").upper()} — CONTENT EXPORT',
-        f'# Site: {SITE_URL}',
+        f'# Site:      {SITE_URL}',
         f'# Generated: {date}',
+        f'# Commit:    {sha}',
+        '#',
+        '# IMPORTANT: Before proposing any changes, verify that this export',
+        f'# matches the current state of the site (commit {sha}, {date}).',
+        '# If you have an older copy, ask for a fresh export before editing.',
         '#',
         SEP,
         '# INSTRUCTIONS FOR THE AI READING THIS FILE',
@@ -71,6 +96,9 @@ def generate_export():
         '#   Content in Markdown...',
         '#   ====END: _posts/my-new-post.md====',
         '#',
+        '# NOTE: existing files show "| last modified: <date>" in their header.',
+        '# Omit that annotation when writing a FILE block — it is metadata only.',
+        '#',
         '# ALLOWED FOLDERS: ' + '  '.join(f'{f}/' for f, _ in COLLECTIONS),
         '#',
         SEP,
@@ -92,7 +120,8 @@ def generate_export():
         for filepath in files:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
-            lines.append(f'====FILE: {filepath}====')
+            mtime = get_file_mtime(filepath)
+            lines.append(f'====FILE: {filepath} | last modified: {mtime}====')
             lines.append(content.rstrip('\n'))
             lines.append(f'====END: {filepath}====')
             lines.append('')
