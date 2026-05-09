@@ -2,7 +2,7 @@
 
 Export your static site content as a single plain-text file for AI editing, then ingest changes back automatically via GitHub Actions.
 
-**The idea:** tap the download button on your phone, upload the file to any AI, share an idea, get a FILE block back, commit it to `_inbox/` — the site updates itself.
+**The idea:** click the download button, upload the file to any AI, share an idea, get a FILE block back, commit it to `_inbox/` — the site updates itself.
 
 ---
 
