@@ -3,6 +3,7 @@
 
 import os
 import glob
+import subprocess
 from datetime import datetime, timezone
 
 # CUSTOMIZE: list your Jekyll collection folders and their human-readable names
@@ -20,8 +21,19 @@ SITE_URL = 'https://yoursite.com'
 SEP = '=' * 72
 
 
+def get_git_sha():
+    try:
+        sha = subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'], stderr=subprocess.DEVNULL
+        ).decode().strip()
+        return sha[:12]
+    except Exception:
+        return 'unknown'
+
+
 def generate_export():
     date = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+    sha = get_git_sha()
 
     lines = [
         '---',
@@ -29,8 +41,13 @@ def generate_export():
         'permalink: /out.txt',
         '---',
         f'# {SITE_URL.replace("https://", "").upper()} — CONTENT EXPORT',
-        f'# Site: {SITE_URL}',
+        f'# Site:      {SITE_URL}',
         f'# Generated: {date}',
+        f'# Commit:    {sha}',
+        '#',
+        '# IMPORTANT: Before proposing any changes, verify that this export',
+        f'# matches the current state of the site (commit {sha}, {date}).',
+        '# If you have an older copy, ask for a fresh export before editing.',
         '#',
         SEP,
         '# INSTRUCTIONS FOR THE AI READING THIS FILE',
