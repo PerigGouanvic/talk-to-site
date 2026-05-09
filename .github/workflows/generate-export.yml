@@ -1,0 +1,35 @@
+name: Generate content export
+
+on:
+  push:
+    branches: [main]
+    paths:
+      # CUSTOMIZE: list your collection folders here
+      - '_posts/**'
+      - '_pages/**'
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate export
+        run: python3 scripts/generate_export.py
+
+      - name: Commit export
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add out/index.txt
+          if git diff --cached --quiet; then
+            echo "No changes to export."
+          else
+            git commit -m "chore: regenerate content export [skip ci]"
+            git push
+          fi
